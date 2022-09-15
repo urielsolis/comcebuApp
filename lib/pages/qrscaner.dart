@@ -236,7 +236,7 @@ class _qrscanerState extends State<qrscaner> {
           builder: (ctx) => AlertDialog(
             title: Text("¿Desea iniciar session como " + persona + "?"),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   // Navigator.of(ctx).pop();
                   _pref.usuario = info['usuario'];
