@@ -59,7 +59,7 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter_icons:
-  image_path: 'assets/icono.png'
+  image_path: 'assets/icono.jpg'
   android: true
   ios: true
 
