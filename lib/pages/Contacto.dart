@@ -5,6 +5,7 @@ import 'package:comcebu/widgets/botonnavegacionwidget.dart';
 import 'package:comcebu/widgets/menuwidget.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class contacto extends StatefulWidget {
   contacto({Key? key}) : super(key: key);
@@ -58,7 +59,19 @@ class _contactoState extends State<contacto> {
                       fontSize: vw(context) * 0.045,
                     ),
                   ),
-                  onTap: () => null,
+                  onTap: () {
+                    if (Platform.isAndroid) {
+                      var whatsappURlAndroid =
+                          "whatsapp://send?phone=+59177647616";
+                      var encoded = Uri.parse(whatsappURlAndroid);
+                      launchUrl(encoded);
+                    }
+                    if (Platform.isIOS) {
+                      var whatappURLIos = "https://wa.me/+59177647616";
+                      var encoded = Uri.parse(whatappURLIos);
+                      launchUrl(encoded);
+                    }
+                  },
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.symmetric(

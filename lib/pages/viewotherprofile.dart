@@ -8,6 +8,7 @@ import 'package:comcebu/widgets/botonnavegacionwidget.dart';
 import 'package:comcebu/widgets/menuwidget.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class viewotherprofile extends StatefulWidget {
   final dynamic cli;
@@ -21,6 +22,7 @@ class _viewotherprofileState extends State<viewotherprofile> {
   final _pref = new PreferenciasUsuario();
   var nombre = "-";
   var telefono = "-";
+  var empresa = "-";
   var email = "-";
   var pais = "bolivia";
   var qr = "-";
@@ -33,6 +35,7 @@ class _viewotherprofileState extends State<viewotherprofile> {
       if (user != null) {
         nombre = widget.cli['Nombre'];
         telefono = widget.cli['Telefono'];
+        empresa = user['Empresa'];
         email = widget.cli['Email'];
         pais = widget.cli['Pais'];
         qr = widget.cli['Qr'];
@@ -114,7 +117,10 @@ class _viewotherprofileState extends State<viewotherprofile> {
                       fontSize: vw(context) * 0.045,
                     ),
                   ),
-                  onTap: () => null,
+                  onTap: () {
+                    Uri url = Uri(scheme: 'tel', path: telefono);
+                    launchUrl(url);
+                  },
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.symmetric(
@@ -126,6 +132,26 @@ class _viewotherprofileState extends State<viewotherprofile> {
                   ),
                   title: Text(
                     email,
+                    style: TextStyle(
+                      color: Color(0xFFFBF9DE),
+                      fontSize: vw(context) * 0.045,
+                    ),
+                  ),
+                  onTap: () {
+                    Uri url = Uri(scheme: 'mailto', path: email);
+                    launchUrl(url);
+                  },
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.symmetric(
+                      vertical: 0, horizontal: vw(context) * 0.1),
+                  dense: true,
+                  leading: Icon(
+                    Icons.business_outlined,
+                    color: Color(0xFFFBF9DE),
+                  ),
+                  title: Text(
+                    empresa,
                     style: TextStyle(
                       color: Color(0xFFFBF9DE),
                       fontSize: vw(context) * 0.045,
@@ -149,34 +175,22 @@ class _viewotherprofileState extends State<viewotherprofile> {
                           ),
                           side: BorderSide(color: Colors.white, width: 1)),
                     ),
-                    onPressed: () => null,
+                    onPressed: () {
+                      if (Platform.isAndroid) {
+                        var whatsappURlAndroid =
+                            "whatsapp://send?phone=" + telefono.split(',')[0];
+                        var encoded = Uri.parse(whatsappURlAndroid);
+                        launchUrl(encoded);
+                      }
+                      if (Platform.isIOS) {
+                        var whatappURLIos =
+                            "https://wa.me/" + telefono.split(',')[0];
+                        var encoded = Uri.parse(whatappURLIos);
+                        launchUrl(encoded);
+                      }
+                    },
                     // No disponible
-                    child: Text("Ver Codigo QR",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: (vw(context) * 0.05),
-                            fontFamily: 'Raleway',
-                            fontWeight: FontWeight.w600)),
-                  ),
-                ),
-                Container(
-                  height: vh(context) * 0.02,
-                ),
-                SizedBox(
-                  width: vw(context) * 0.77,
-                  height: vh(context) * 0.06,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Color(0xFF007632),
-                      onSurface: Color(0xFF007632),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            vh(context) * 0.018,
-                          ),
-                          side: BorderSide(color: Colors.white, width: 1)),
-                    ),
-                    onPressed: () => null,
-                    child: Text("descargar Codigo QR",
+                    child: Text("Ir a WhatssApp",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: (vw(context) * 0.05),

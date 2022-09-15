@@ -20,8 +20,14 @@ class UserProvider {
     }
   }
 
-  Future<Map<String, dynamic>> qrScanner(String qr) async {
-    final authData = {'codescan': qr};
+  Future<Map<String, dynamic>> qrScanner(
+      String qr, int tipoScan, int act) async {
+    final authData = {
+      'codescan': qr,
+      'tipoScan': tipoScan.toString(),
+      'idact': act.toString()
+    };
+    print(authData);
     final url = '$urlBase/qrScanner';
     final resp = await http.post(Uri.parse(url), body: authData);
     Map<String, dynamic> decodeResp = json.decode(resp.body.toString());
@@ -31,6 +37,28 @@ class UserProvider {
       return {
         'ok': true,
         'usuario': json.encode(decodeResp['data']).toString(),
+        'mensaje': decodeResp['mensaje']
+      };
+    } else {
+      if (decodeResp.containsKey('mensaje')) {
+        return {'ok': false, 'mensaje': decodeResp['mensaje']};
+      } else {
+        return {'ok': false, 'mensaje': "Error desconocido en el servicio."};
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>> getday() async {
+    final authData = {};
+    final url = '$urlBase/getDay';
+    final resp = await http.post(Uri.parse(url), body: authData);
+    Map<String, dynamic> decodeResp = json.decode(resp.body.toString());
+    if (decodeResp.containsKey('dia')) {
+      // _pref.usuario = json.encode(decodeResp['data']).toString();
+      // _pref.idusuario = decodeResp['data']['Inscrito'].toString();
+      return {
+        'ok': true,
+        'dia': json.encode(decodeResp['dia']).toString(),
         'mensaje': decodeResp['mensaje']
       };
     } else {

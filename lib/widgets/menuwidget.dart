@@ -202,7 +202,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                             Icons.location_on,
                             color: Color(0xFF007632),
                           ),
-                          title: Text('ubicaciones',
+                          title: Text('Ubicaciones',
                               style: TextStyle(
                                 color: Color(0xFF007632),
                                 fontSize: vw(context) * 0.045,

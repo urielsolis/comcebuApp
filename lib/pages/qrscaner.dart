@@ -21,22 +21,45 @@ class qrscaner extends StatefulWidget {
 }
 
 class _qrscanerState extends State<qrscaner> {
-  // final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  // Barcode? result;
-  // QRViewController? controller;
   final _pref = new PreferenciasUsuario();
   String textCode = "";
+  int tipoScan = 1;
+  int dia = 0;
+  dynamic uss;
+  List<dynamic> actividades = [];
+  List<dynamic> actividadesMostradas = [];
   final userProvider = new UserProvider();
-  // In order to get hot reload to work we need to pause the camera if the platform
-  // is android, or resume the camera if the platform is iOS.
   @override
   void reassemble() {
+    if (_pref.usuario != "") {
+      this.uss = json.decode(_pref.usuario);
+      actividades = uss['Actividades'];
+    }
+    getDia();
+    setState(() {});
     super.reassemble();
-    // if (Platform.isAndroid) {
-    //   controller!.pauseCamera();
-    // } else if (Platform.isIOS) {
-    //   controller!.resumeCamera();
-    // }
+  }
+
+  @override
+  void initState() {
+    if (_pref.usuario != "") {
+      this.uss = json.decode(_pref.usuario);
+      actividades = uss['Actividades'];
+    }
+    getDia();
+    setState(() {});
+    super.initState();
+  }
+
+  Future<Null> getDia() async {
+    Map info = await userProvider.getday();
+    if (info['ok']) {
+      dia = int.parse(info['dia']);
+      actividadesMostradas = actividades
+          .where((element) => int.parse(element['Dia']) == (dia))
+          .toList();
+    }
+    setState(() {});
   }
 
   @override
@@ -45,94 +68,82 @@ class _qrscanerState extends State<qrscaner> {
       appBar: AppBarWidget(title: ''),
       body: Stack(
         children: <Widget>[
-          // Expanded(
-          //   flex: 5,
-          //   child: QRView(
-          //     key: qrKey,
-          //     onQRViewCreated: _onQRViewCreated,
-          //   ),
-          // ),
-          // Expanded(
-          //   flex: 1,
-          //   child: Center(
-          //     child: (result != null)
-          //         ? Text(
-          //             'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
-          //         : Text('Scan a code'),
-          //   ),
-          // ),
-          Column(
-            children: [
-              Container(
-                height: vh(context) * 0.05,
-              ),
-              Text(
-                'Seleccione la opcion para leer el qr de acceso.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15),
-              ),
-              Container(
-                height: vh(context) * 0.02,
-              ),
-              Row(
-                children: [
-                  Expanded(child: Container()),
-                  SizedBox(
-                    width: vw(context) * 0.4,
-                    height: vh(context) * 0.06,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF007632),
-                        onSurface: Color(0xFF007632),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            vh(context) * 0.018,
+          _pref.usuario != ""
+              ? (this.uss['Tipo'] == "Staff"
+                  ? Container(
+                      width: vw(context) * 0.8,
+                      margin:
+                          EdgeInsets.symmetric(horizontal: vw(context) * 0.1),
+                      child: Image.asset('assets/Eventos Del Día.png'),
+                    )
+                  : Container())
+              : Container(),
+          _pref.usuario != ""
+              ? (this.uss['Tipo'] == "Staff"
+                  ? Container(
+                      margin: EdgeInsets.only(top: vh(context) * 0.1),
+                      child: Column(
+                        children: _mosAct(),
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        Container(
+                          height: vh(context) * 0.35,
+                        ),
+                        SizedBox(
+                          width: vw(context) * 0.4,
+                          height: vh(context) * 0.06,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: Color(0xFF007632),
+                              onSurface: Color(0xFF007632),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  vh(context) * 0.018,
+                                ),
+                              ),
+                            ),
+                            onPressed: _scan,
+                            child: Text("Scanner",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: (vw(context) * 0.05),
+                                    fontFamily: 'Raleway',
+                                    fontWeight: FontWeight.w600)),
                           ),
                         ),
-                      ),
-                      onPressed: _scan,
-                      child: Text("Camara",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: (vw(context) * 0.05),
-                              fontFamily: 'Raleway',
-                              fontWeight: FontWeight.w600)),
+                      ],
+                    ))
+              : Column(
+                  children: [
+                    Container(
+                      height: vh(context) * 0.35,
                     ),
-                  ),
-                  Expanded(child: Container()),
-                  SizedBox(
-                    width: vw(context) * 0.4,
-                    height: vh(context) * 0.06,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF007632),
-                        onSurface: Color(0xFF007632),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            vh(context) * 0.018,
+                    SizedBox(
+                      width: vw(context) * 0.4,
+                      height: vh(context) * 0.06,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Color(0xFF007632),
+                          onSurface: Color(0xFF007632),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              vh(context) * 0.018,
+                            ),
                           ),
                         ),
+                        onPressed: _scan,
+                        child: Text("Scanner",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: (vw(context) * 0.05),
+                                fontFamily: 'Raleway',
+                                fontWeight: FontWeight.w600)),
                       ),
-                      onPressed: _scanPhoto,
-                      child: Text("storage",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: (vw(context) * 0.05),
-                              fontFamily: 'Raleway',
-                              fontWeight: FontWeight.w600)),
                     ),
-                  ),
-                  Expanded(child: Container()),
-                ],
-              ),
-            ],
-          ),
-          // Expanded(
-          //   flex: 1,
-          //   child: Center(
-          //     child: (textCode != "") ? Text(textCode) : Text('Scan a code'),
-          //   ),
-          // ),
+                  ],
+                ),
         ],
       ),
       drawer: MenuWidget().createState().build(context),
@@ -142,14 +153,39 @@ class _qrscanerState extends State<qrscaner> {
     );
   }
 
-  // void _onQRViewCreated(QRViewController controller) {
-  //   this.controller = controller;
-  //   controller.scannedDataStream.listen((scanData) {
-  //     setState(() {
-  //       result = scanData;
-  //     });
-  //   });
-  // }
+  List<Widget> _mosAct() {
+    List<Widget> res = [];
+    print(actividadesMostradas);
+    actividadesMostradas.forEach((element) {
+      res.add(ListTile(
+        contentPadding:
+            EdgeInsets.symmetric(vertical: 0, horizontal: vw(context) * 0.1),
+        dense: true,
+        trailing: Icon(
+          Icons.qr_code_scanner,
+          color: Color(0xFF007632),
+        ),
+        title: Text(
+          element['Actividad'],
+          style: TextStyle(
+            color: Color(0xFF007632),
+            fontSize: vw(context) * 0.04,
+          ),
+        ),
+        subtitle: Text(
+          (element['feInicio'] != null ? element['feInicio'] : '') +
+              '-' +
+              (element['feFin'] != null ? element['feFin'] : ''),
+          style: TextStyle(
+            color: Color(0xFF007632),
+            fontSize: vw(context) * 0.03,
+          ),
+        ),
+        onTap: () => _scan2(element['Id']),
+      ));
+    });
+    return res;
+  }
 
   Future _scan() async {
     await Permission.camera.request();
@@ -159,14 +195,39 @@ class _qrscanerState extends State<qrscaner> {
     } else {
       this.textCode = barcode;
       setState(() {});
-      scanServe(this.textCode);
+      scanServe(this.textCode, 0);
     }
   }
 
-  Future scanServe(String qr) async {
-    Map info = await userProvider.qrScanner(qr);
+  Future _scan2(int act) async {
+    await Permission.camera.request();
+    String? barcode = await scanner.scan();
+    if (barcode == null) {
+      print('nothing return.');
+    } else {
+      this.textCode = barcode;
+      setState(() {});
+      scanServe(this.textCode, act);
+    }
+  }
+
+  Future scanServe(String qr, int act) async {
+    if (_pref.usuario == "") {
+      this.tipoScan = 2;
+      print(this.tipoScan);
+    } else {
+      if (this.uss['Tipo'] == 'Staff') {
+        this.tipoScan = 1;
+      } else {
+        this.tipoScan = 2;
+      }
+      print('la puta');
+      print(this.tipoScan);
+    }
+    print(this.uss);
+    setState(() {});
+    Map info = await userProvider.qrScanner(qr, this.tipoScan, act);
     if (info['ok']) {
-      // Navigator.of(context).pushNamedAndRemoveUntil('scaner', (route) => false);
       Map<String, dynamic> userscan = json.decode(info['usuario'].toString());
       var persona = userscan['Nombre'];
       if (_pref.usuario == "") {
