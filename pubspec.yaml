@@ -45,6 +45,7 @@ dependencies:
   permission_handler: ^10.0.0
   url_launcher:
   maps_launcher:
+  barcode_scan: 
 
 dev_dependencies:
   flutter_test:
