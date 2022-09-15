@@ -11,7 +11,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:qrscan/qrscan.dart' as scanner;
+import 'package:barcode_scan2/barcode_scan2.dart';
+// import 'package:qrscan/qrscan.dart' as scanner;
 
 class qrscaner extends StatefulWidget {
   qrscaner({Key? key}) : super(key: key);
@@ -189,7 +190,25 @@ class _qrscanerState extends State<qrscaner> {
 
   Future _scan() async {
     await Permission.camera.request();
-    String? barcode = await scanner.scan();
+    // try {
+    //   String barcode = await BarcodeScanner.scan();
+    //   setState(() => this._barcode = barcode);
+    // } on PlatformException catch (e) {
+    //   if (e.code == BarcodeScanner.CameraAccessDenied) {
+    //     setState(() {
+    //       this._barcode = 'El usuario no dio permiso para el uso de la cámara!';
+    //     });
+    //   } else {
+    //     setState(() => this._barcode = 'Error desconocido $e');
+    //   }
+    // } on FormatException {
+    //   setState(() => this._barcode =
+    //       'nulo, el usuario presionó el botón de volver antes de escanear algo)');
+    // } catch (e) {
+    //   setState(() => this._barcode = 'Error desconocido : $e');
+    // }
+
+    String? barcode = (await BarcodeScanner.scan()).rawContent;
     if (barcode == null) {
       print('nothing return.');
     } else {
@@ -201,7 +220,7 @@ class _qrscanerState extends State<qrscaner> {
 
   Future _scan2(int act) async {
     await Permission.camera.request();
-    String? barcode = await scanner.scan();
+    String? barcode = (await BarcodeScanner.scan()).rawContent;
     if (barcode == null) {
       print('nothing return.');
     } else {
@@ -276,7 +295,7 @@ class _qrscanerState extends State<qrscaner> {
 
   Future _scanPhoto() async {
     await Permission.storage.request();
-    String barcode = await scanner.scanPhoto();
+    String? barcode = (await BarcodeScanner.scan()).rawContent;
     this.textCode = barcode;
     setState(() {});
   }

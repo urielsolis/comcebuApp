@@ -54,5 +54,7 @@
 			<string>whatsapp</string>
 			<string>tel</string>
 		</array>
+		<key>NSCameraUsageDescription</key>
+		<string>El Permiso de uso de la Camara, es requerido para la lectura de Qrs.</string>
 	</dict>
 </plist>
